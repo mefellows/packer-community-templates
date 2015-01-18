@@ -2,7 +2,8 @@
   "builders": [
     {
       "type": "virtualbox-windows-iso",
-      "iso_url": "/Users/mfellows/Downloads/SW_DVD5_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_Core_MLF_X19-05182.ISO",
+      "vm_name": "vagrant-rsync",
+      "iso_url": "http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.16384.WINBLUE_RTM.130821-1623_X64FRE_SERVER_EVAL_EN-US-IRM_SSS_X64FREE_EN-US_DV5.ISO",
       "iso_checksum_type": "md5",
       "iso_checksum": "83bdf8034bcb019a8f001baeeab27326",
       "winrm_username": "vagrant",
@@ -45,7 +46,7 @@
     },
     {
       "type": "virtualbox-windows-ovf",
-      "source_path": "/Users/mfellows/Downloads/output-virtualbox-iso/packer-virtualbox-iso-1417096689.ovf",
+      "source_path": "./output-virtualbox-windows-iso/vagrant-rsync.ovf",
       "headless": false,
       "guest_additions_mode": "disable",
       "boot_wait": "30s",
