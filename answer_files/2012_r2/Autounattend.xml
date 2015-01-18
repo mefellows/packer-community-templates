@@ -233,6 +233,12 @@
                     <Order>22</Order>
                     <Description>Disable password expiration for vagrant user</Description>
                 </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <CommandLine>cmd.exe /c powershell -File a:\disable-password-complexity.ps1</CommandLine>
+                    <Description>Disable password complexity</Description>
+                    <Order>23</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>               
                 <!-- WITHOUT WINDOWS UPDATES 
                 
                 <SynchronousCommand wcm:action="add">
