@@ -1,0 +1,129 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-windows-iso",
+      "iso_url": "/Users/mfellows/Downloads/SW_DVD5_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_Core_MLF_X19-05182.ISO",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "83bdf8034bcb019a8f001baeeab27326",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_wait_timeout": "10m",
+      "winrm_port":5985,
+      "headless": false,
+      "boot_wait": "1m",
+      "guest_additions_mode": "disable",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",      
+      "guest_os_type": "Windows2012_64",
+      "disk_size": 61440,
+      "floppy_files": [
+        "./answer_files/2012_r2/Autounattend.xml",
+        "./answer_files/2012_r2/Autounattend_sysprep.xml",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/win-updates.ps1",
+        "./scripts/oracle-cert.cer"
+      ],
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "2048"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--natpf1",
+          "guestwinrm,tcp,127.0.0.1,5985,,5985"
+        ]
+      ]
+    },
+    {
+      "type": "virtualbox-windows-ovf",
+      "source_path": "/Users/mfellows/Downloads/output-virtualbox-iso/packer-virtualbox-iso-1417096689.ovf",
+      "headless": false,
+      "guest_additions_mode": "disable",
+      "boot_wait": "30s",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_wait_timeout": "5m",
+      "winrm_port":5985,
+      "winrm_host":"localhost",
+      "shutdown_command": "c:/windows/system32/sysprep/sysprep.exe /generalize /oobe /quiet /shutdown /unattend:c:/Windows/Temp/Autounattend_sysprep.xml",
+      "shutdown_timeout": "10m",
+      "http_directory":"/tmp",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "2048"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "64"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/virtualbox-guest-tools.ps1",
+        "./scripts/disable-password-complexity.ps1"
+      ],
+      "only":["virtualbox-windows-iso"]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/openssh.ps1"
+      ],
+      "only":["virtualbox-windows-ovf"]
+    },
+    {
+      "type":"windows-shell",
+      "scripts": [
+        "./scripts/rsync.bat"
+      ],
+      "only":["virtualbox-windows-ovf"]
+    },
+    {
+      "type":"powershell",
+      "inline": [
+        "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
+        "choco install seek-dsc"
+      ],
+      "only":["virtualbox-windows-ovf"]
+    },
+    {
+      "type": "file",
+      "source": "./answer_files/2012_r2/Autounattend_sysprep.xml",
+      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml",
+      "only":["virtualbox-windows-ovf"]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "windows2012r2-{{.Provider}}.box",
+      "vagrantfile_template": "vagrantfile-windows_2012_r2.template",
+	    "only":["virtualbox-windows-ovf"]
+    }
+  ]
+}
