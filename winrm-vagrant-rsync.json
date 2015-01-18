@@ -3,7 +3,7 @@
     {
       "type": "virtualbox-windows-iso",
       "vm_name": "vagrant-rsync",
--      "iso_url": "http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.16384.WINBLUE_RTM.130821-1623_X64FRE_SERVER_EVAL_EN-US-IRM_SSS_X64FREE_EN-US_DV5.ISO",
+      "iso_url": "/Users/mfellows/Downloads/SW_DVD5_Windows_Svr_Std_and_DataCtr_2012_R2_64Bit_English_Core_MLF_X19-05182.ISO",
       "iso_checksum_type": "md5",
       "iso_checksum": "83bdf8034bcb019a8f001baeeab27326",
       "winrm_username": "vagrant",
@@ -12,7 +12,8 @@
       "winrm_port":5985,
       "headless": false,
       "boot_wait": "1m",
-      "guest_additions_mode": "upload",      
+      "guest_additions_mode": "upload",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "guest_os_type": "Windows2012_64",
       "disk_size": 61440,
       "floppy_files": [
@@ -54,7 +55,7 @@
       "winrm_wait_timeout": "5m",
       "winrm_port":5985,
       "winrm_host":"localhost",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",      
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "shutdown_timeout": "10m",
       "http_directory":"/tmp",
       "vboxmanage": [
