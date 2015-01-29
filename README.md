@@ -17,6 +17,7 @@
   ```
   packer build -only=virtualbox-windows-ovf winrm-vagrant-rsync.json
   ```
+
 ## Sysprep
 
 An example unattended sysprep file is automatically uploaded to `c:/Windows/Temp/Autounattend_sysprep.xml` which can be used in a provisioner to sysprep the machine. For example, 
