@@ -7,19 +7,9 @@ cmd.exe /c net localgroup administrators vagrant /add
 
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 
-# RDP
-#cmd.exe /c netsh advfirewall firewall add rule name="Open Port 3389" dir=in action=allow protocol=TCP localport=3389
-#cmd.exe /c reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
-
-# TODO: Removed this to test if this is the issue with blocking ports / no connectivity
-
 # WinRM
 write-output "Setting up WinRM"
 write-host "(host) setting up WinRM"
-# Enable-WSManCredSSP -role client -delegatecomputer * -force
-# Enable-WSManCredSSP -role client -delegatecomputer *.seek.int  -force
-# Enable-WSManCredSSP -role server -force
-# Restart-Service WinRM
 
 cmd.exe /c winrm quickconfig -q
 cmd.exe /c winrm quickconfig '-transport:http'
