@@ -1,0 +1,119 @@
+{
+  "builders": [
+    {
+      "type": "parallels-windows-iso",
+      "vm_name": "vagrant-rsync",
+      "iso_url": "http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.16384.WINBLUE_RTM.130821-1623_X64FRE_SERVER_EVAL_EN-US-IRM_SSS_X64FREE_EN-US_DV5.ISO",
+      "iso_checksum_type": "md5",
+      "iso_checksum": "458ff91f8abc21b75cb544744bf92e6a",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_wait_timeout": "60m",
+      "winrm_port":5985,
+      "headless": false,
+      "boot_wait": "2m",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "guest_os_type": "win-8.1",
+      "parallels_tools_flavor": "win",
+      "disk_size": 61440,
+      "floppy_files": [
+        "./answer_files/2012_r2/parallels/Autounattend.xml",  
+        "./scripts/microsoft-updates.bat",
+        "./scripts/win-updates.ps1",
+        "./scripts/oracle-cert.cer",
+        "./scripts/disable-password-complexity.ps1"
+      ],
+      "prlctl": [
+        ["set", "{{.Name}}", "--memsize", "2048"],
+        ["set", "{{.Name}}", "--cpus", "2"],
+        ["set", "{{.Name}}", "--winsystray-in-macmenu", "off"],
+        ["set", "{{.Name}}", "--startup-view", "window"]
+      ]
+    },
+    {
+      "type": "parallels-windows-pvm",
+      "source_path": "./output-parallels-windows-iso/vagrant-rsync.pvm",
+      "headless": false,
+      "boot_wait": "30s",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_wait_timeout": "5m",
+      "winrm_port":5985,
+      "winrm_host":"localhost",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_timeout": "10m",
+      "parallels_tools_mode": "disable",
+      "prlctl": [
+        ["set", "{{.Name}}", "--memsize", "2048"],
+        ["set", "{{.Name}}", "--cpus", "2"],
+        ["set", "{{.Name}}", "--winsystray-in-macmenu", "off"],
+        ["set", "{{.Name}}", "--startup-view", "window"]
+      ]
+    }      
+  ],
+  "provisioners": [
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/parallels-guest-tools.ps1",
+        "./scripts/disable-password-complexity.ps1"
+      ],
+      "only":["basebox-parallels"]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/openssh.ps1"
+      ],
+      "only":["parallels-windows-ovf"]
+    },
+    {
+      "type":"windows-shell",
+      "scripts": [
+        "./scripts/rsync.bat"
+      ],
+      "only":["parallels-windows-ovf"]
+    },
+    {
+      "type":"powershell",
+      "inline": [
+        "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
+        "choco install seek-dsc"
+      ],
+      "only":["parallels-windows-ovf"]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/cleanup.ps1"
+      ],
+      "only":["parallels-windows-ovf"]
+    },
+    {
+      "type": "restart-windows",
+      "only":["parallels-windows-ovf"]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "./scripts/cleanup2.ps1"
+      ],
+      "only":["parallels-windows-ovf"]
+    },    
+    {
+      "type": "file",
+      "source": "./answer_files/2012_r2/Autounattend_sysprep.xml",
+      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml",
+      "only":["parallels-windows-ovf"]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true,
+      "output": "windows2012r2-{{.Provider}}.box",
+      "vagrantfile_template": "vagrantfile-windows_2012_r2.template",
+	    "only":["parallels-windows-ovf"]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Packer Community Example Templates
 
-[Packer Community](https://github.com/packer-community/packer-windows-plugins/) Templates for Windows environments.
+[Packer Community](https://github.com/packer-community/packer-windows-plugins/) Templates for Windows environments to test/showcase many of the Windows-specific Builders and Provisioners.
 
 ## Running 
 
@@ -12,10 +12,18 @@
   ```
 
 * Run Packer 
-  This example runs only the OVF builder:
+
+  Run the ISO builder to produce a simple base box with VirtualBox guest additions and optionally Windows updates:
 
   ```
-  packer build -only=virtualbox-windows-ovf winrm-vagrant-rsync.json
+  packer build -only=virtualbox-windows-iso 2012r2_virtualbox.json
+  ```
+
+  Run the OVF builder to produce a simple base box with rsync and Seek DSC resources installed:
+  
+
+  ```
+  packer build -only=virtualbox-windows-ovf 2012r2_virtualbox.json
   ```
 
 ## Sysprep
