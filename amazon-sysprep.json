@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "build_version": "1.0.1",
+    "base_ami":"ami-3a3b1d52",
+    "user":"vagrant",
+    "password":"FooBar@123",
+    "instance_type":"t2.small",
+    "vpc_id":"",
+    "subnet_id":""
+  },  
+  "builders": [
+    {
+      "type": "amazon-windows-ebs",
+      "name": "base-ami",
+      "region": "us-east-1",
+      "source_ami": "{{user `base_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ami_name": "sysprep-windows-{{user `build_version`}}",
+      "user_data_file":"./scripts/ec2-bootstrap.ps1",
+      "associate_public_ip_address":true,
+      "winrm_username": "{{user `user`}}",
+      "winrm_password": "{{user `password`}}",
+      "winrm_wait_timeout": "20m",
+      "winrm_private_ip": false,
+      "winrm_port":5985,
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type":"powershell",
+      "scripts": [
+        "./scripts/Ec2Config.ps1",
+        "./scripts/BundleConfig.ps1"
+      ]
+    }
+  ]
+}
