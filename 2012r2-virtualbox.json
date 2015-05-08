@@ -8,7 +8,7 @@
       "iso_checksum": "458ff91f8abc21b75cb544744bf92e6a",
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
-      "winrm_wait_timeout": "10m",
+      "winrm_wait_timeout": "8h",
       "winrm_port":5985,
       "headless": false,
       "boot_wait": "1m",
@@ -17,7 +17,7 @@
       "guest_os_type": "Windows2012_64",
       "disk_size": 61440,
       "floppy_files": [
-        "./answer_files/2012_r2/Autounattend.xml",        
+        "./answer_files/2012_r2/Autounattend.xml",
         "./scripts/microsoft-updates.bat",
         "./scripts/win-updates.ps1",
         "./scripts/oracle-cert.cer",
@@ -82,6 +82,20 @@
   ],
   "provisioners": [
     {
+      "type":"powershell",
+      "inline": [
+        "(iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')))>$null 2>&1",
+        "choco install 7zip -y"
+      ],
+      "only":["virtualbox-windows-iso"]
+    },
+    {
+      "type": "file",
+      "source": "./answer_files/2012_r2/Autounattend_sysprep.xml",
+      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml",
+      "only":["virtualbox-windows-iso"]
+    },
+    {
       "type": "powershell",
       "scripts": [
         "./scripts/virtualbox-guest-tools.ps1",
@@ -104,10 +118,11 @@
       "only":["virtualbox-windows-ovf"]
     },
     {
-      "type":"powershell",
-      "inline": [
-        "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))",
-        "choco install seek-dsc"
+      "type": "powershell",
+      "elevated_user": "vagrant",
+      "elevated_password": "vagrant",
+      "scripts": [
+        "./scripts/provision.ps1"
       ],
       "only":["virtualbox-windows-ovf"]
     },
@@ -127,12 +142,6 @@
       "scripts": [
         "./scripts/cleanup2.ps1"
       ],
-      "only":["virtualbox-windows-ovf"]
-    },    
-    {
-      "type": "file",
-      "source": "./answer_files/2012_r2/Autounattend_sysprep.xml",
-      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml",
       "only":["virtualbox-windows-ovf"]
     }
   ],
